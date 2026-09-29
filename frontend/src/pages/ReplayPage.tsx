@@ -22,7 +22,10 @@ export default function ReplayPage() {
     return () => sock.close();
   }, []);
   useEffect(() => {
-    ws.current?.readyState === 1 && ws.current.send(JSON.stringify({ speed }));
+    const sock = ws.current;
+    if (sock && sock.readyState === WebSocket.OPEN) {
+      sock.send(JSON.stringify({ speed }));
+    }
   }, [speed]);
   const data = (frame?.ecg ?? []).map((y, i) => ({ i, y }));
   return (

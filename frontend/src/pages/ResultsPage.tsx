@@ -17,7 +17,9 @@ export default function ResultsPage() {
       </div>
     );
   }
-  const latest = results[results.length - 1] ?? (runs[runs.length - 1] ? { metrics: runs[runs.length - 1].metrics, model_id: runs[runs.length - 1].id } : null);
+  const lastEval = results.length > 0 ? results[results.length - 1] : undefined;
+  const lastRun = runs.length > 0 ? runs[runs.length - 1] : undefined;
+  const latest = lastEval ?? (lastRun ? { metrics: lastRun.metrics, model_id: lastRun.id } : null);
   const metrics = (latest?.metrics ?? {}) as Record<string, number>;
   const keys = Object.keys(metrics);
   if (keys.length === 0) {

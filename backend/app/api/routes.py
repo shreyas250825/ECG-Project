@@ -20,7 +20,7 @@ from app.services.analysis import (
     save_upload,
     update_twin,
 )
-from app.services.ml import load_model, run_forecast, train_models
+from app.services.ml import run_forecast, train_models
 from app.services.pipeline import STAGES
 
 router = APIRouter()
