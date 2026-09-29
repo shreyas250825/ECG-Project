@@ -1,0 +1,50 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+dist/
+build/
+
+# Models and large artifacts
+backend/models/*.pt
+backend/models/*.pkl
+ml/artifacts/
+*.ckpt
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Data (keep sample only)
+data/uploads/
+data/cache/
+
+# Hardware bitstreams (too large / proprietary)
+hardware/pynq/overlays/*.bit
+hardware/pynq/overlays/*.hwh
+!hardware/pynq/overlays/.gitkeep
