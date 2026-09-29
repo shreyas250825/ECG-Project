@@ -9,7 +9,6 @@ import numpy as np
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.db.store import store
-from app.digital_twin.baseline import PatientBaseline
 from app.digital_twin.state import build_state
 from app.processing.features import extract_features
 from app.processing.preprocess import PreprocessParams, preprocess_ecg
