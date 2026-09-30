@@ -1,9 +1,10 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useUI } from "../stores/ui";
-import { PrototypeBadges } from "./Disclaimer";
+import { PrototypeBadges } from "../components/Disclaimer";
 
-const links = [
+const links: [string, string][] = [
   ["/", "Overview"],
+  ["/dashboard", "Research Dashboard"],
   ["/pipeline", "Pipeline"],
   ["/analysis", "ECG Analysis"],
   ["/twin", "Digital Twin"],
@@ -66,7 +67,7 @@ export default function AppLayout() {
           ))}
         </nav>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-7xl px-6 py-8">
         <Outlet />
       </main>
     </div>

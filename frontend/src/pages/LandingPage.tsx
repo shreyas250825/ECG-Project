@@ -68,7 +68,10 @@ export default function LandingPage() {
         configurable horizon H (5, 10, 20, 30 minutes are evaluation settings, not guaranteed warning times).
       </p>
       <div className="flex flex-wrap gap-3 text-sm">
-        <Link className="bg-teal-800 px-4 py-2 text-white" to="/pipeline">
+        <Link className="bg-teal-800 px-4 py-2 text-white" to="/dashboard">
+          Open research dashboard
+        </Link>
+        <Link className="border border-slate-300 bg-white px-4 py-2" to="/pipeline">
           Open pipeline
         </Link>
         <Link className="border border-slate-300 bg-white px-4 py-2" to="/analysis">

@@ -37,6 +37,8 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then(parse),
+  twinStates: (record_id?: string) =>
+    fetch(`${API}/digital-twin/states${record_id ? `?record_id=${encodeURIComponent(record_id)}` : ""}`).then(parse),
   train: (body: object) =>
     fetch(`${API}/model/train`, {
       method: "POST",
@@ -49,6 +51,8 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then(parse),
+  forecastResults: (record_id?: string) =>
+    fetch(`${API}/forecast/results${record_id ? `?record_id=${encodeURIComponent(record_id)}` : ""}`).then(parse),
   evaluation: () => fetch(`${API}/evaluation`).then(parse),
   results: (id: string) => fetch(`${API}/results/${id}`).then(parse),
   modelRuns: () => fetch(`${API}/model/runs`).then(parse),

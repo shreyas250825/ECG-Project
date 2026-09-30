@@ -1,5 +1,8 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { CardiologistPresentation } from "../components/dashboard/CardiologistPresentation";
 import { Disclaimer } from "../components/Disclaimer";
+import { EMPTY_VISUALIZATION_STATE } from "../components/heart3d/types";
 
 const steps = [
   ["Problem", "Short-term ventricular-arrhythmia-related risk is difficult to characterise from a single snapshot ECG."],
@@ -15,14 +18,24 @@ const steps = [
 ];
 
 export default function ExplainPage() {
+  const [showViz, setShowViz] = useState(true);
+  const viz = useMemo(() => ({ ...EMPTY_VISUALIZATION_STATE }), []);
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl">Explain to cardiologist</h2>
       <Disclaimer compact />
+      <label className="flex items-center gap-2 text-sm">
+        <input type="checkbox" checked={showViz} onChange={(e) => setShowViz(e.target.checked)} />
+        Show 3D conceptual visualization (illustrative; no ECG loaded on this page)
+      </label>
+      {showViz && <CardiologistPresentation viz={viz} lastRPeakMs={null} />}
       <ol className="space-y-3">
         {steps.map(([t, b], i) => (
           <li key={t} className="border border-slate-200 bg-white p-4">
-            <p className="text-xs uppercase text-teal-800">{i + 1}. {t}</p>
+            <p className="text-xs uppercase text-teal-800">
+              {i + 1}. {t}
+            </p>
             <p className="mt-1">{b}</p>
           </li>
         ))}
@@ -37,6 +50,15 @@ export default function ExplainPage() {
         <h3 className="text-lg">Why this is different from simple arrhythmia detection</h3>
         <p>Detection: the event is already happening in the analysed window.</p>
         <p>Forecasting: estimate future target-event risk from preceding temporal information, for an experimental horizon H.</p>
+        <h3 className="text-lg">Role of the 3D heart</h3>
+        <p>
+          The 3D heart is a visualization layer for ECG-derived computational state. It is not a patient-specific anatomical
+          reconstruction, physiological simulation, or clinical diagnostic model. Live synchronized demo:{" "}
+          <Link className="text-teal-800 underline" to="/dashboard">
+            Research Dashboard
+          </Link>
+          .
+        </p>
       </section>
       <Link className="inline-block bg-teal-800 px-4 py-2 text-sm text-white" to="/architecture">
         Interactive architecture

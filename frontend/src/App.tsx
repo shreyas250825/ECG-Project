@@ -3,6 +3,7 @@ import AppLayout from "./layouts/AppLayout";
 import AboutPage from "./pages/AboutPage";
 import AnalysisPage from "./pages/AnalysisPage";
 import ArchitecturePage from "./pages/ArchitecturePage";
+import DashboardPage from "./pages/DashboardPage";
 import DatasetsPage from "./pages/DatasetsPage";
 import ExplainPage from "./pages/ExplainPage";
 import ForecastPage from "./pages/ForecastPage";
@@ -21,6 +22,7 @@ export default function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/pipeline" element={<PipelinePage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/twin" element={<TwinPage />} />

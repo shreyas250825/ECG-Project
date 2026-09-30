@@ -101,8 +101,21 @@ class MemoryStore:
         return self.baselines.get(record_id)
 
     def add_twin_state(self, payload: dict) -> dict:
-        self.twin_states.append(payload)
-        return payload
+        row = {**payload, "id": payload.get("id") or _id()}
+        self.twin_states.append(row)
+        return row
+
+    def list_twin_states(self, record_id: str | None = None) -> list[dict]:
+        rows = self.twin_states
+        if record_id:
+            rows = [r for r in rows if r.get("record_id") == record_id]
+        return sorted(rows, key=lambda r: float(r.get("timestamp") or 0.0))
+
+    def list_forecast_results(self, record_id: str | None = None) -> list[dict]:
+        rows = self.forecast_results
+        if record_id:
+            rows = [r for r in rows if r.get("record_id") == record_id]
+        return list(rows)
 
 
 store = MemoryStore()

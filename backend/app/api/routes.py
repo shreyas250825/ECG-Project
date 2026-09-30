@@ -167,6 +167,14 @@ def twin(body: DigitalTwinRequest):
     return update_twin(body.record_id, body.timestamp_s, body.window_s)
 
 
+@router.get("/digital-twin/states")
+def twin_states(record_id: str | None = None):
+    return {
+        "states": store.list_twin_states(record_id),
+        "disclaimer": DISCLAIMER,
+    }
+
+
 @router.post("/model/train")
 def train(body: TrainRequest):
     return train_models(body)
@@ -180,6 +188,14 @@ def model_runs():
 @router.post("/forecast/run")
 def forecast(body: ForecastRunRequest):
     return run_forecast(body)
+
+
+@router.get("/forecast/results")
+def forecast_results(record_id: str | None = None):
+    return {
+        "results": store.list_forecast_results(record_id),
+        "disclaimer": DISCLAIMER,
+    }
 
 
 @router.get("/results/{id}")
