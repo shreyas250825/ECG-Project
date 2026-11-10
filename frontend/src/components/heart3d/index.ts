@@ -7,11 +7,13 @@ export type {
 } from "./types";
 export { EMPTY_VISUALIZATION_STATE, ANATOMY_LABELS } from "./types";
 export { HeartScene } from "./HeartScene";
+export type { HeartSceneProps } from "./HeartScene";
 export { HeartModel } from "./HeartModel";
 export { RealisticHeart } from "./RealisticHeart";
 export { HeartControls } from "./HeartControls";
 export { HeartState } from "./HeartState";
-export { HeartLabels } from "./HeartLabels";
+export { HeartLabelAnchors, HeartLabelOverlay } from "./HeartLabels";
+export type { LabelAnchorsHandle, LabelAnchor } from "./HeartLabels";
 export { HeartLegend } from "./HeartLegend";
 export { deriveCardiacVisualizationState, twinHistoryFromStates } from "./deriveVisualizationState";
 export { pulseIntervalFromHr, pulseScale } from "./heartAnimations";

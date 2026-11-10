@@ -28,7 +28,11 @@ def test_records_and_processing():
     assert r.status_code == 200
     recs = r.json()["records"]
     assert recs
-    rid = recs[0]["id"]
+    # Find the synthetic demo record explicitly — other records may be loaded in
+    # shared test state (e.g. MITDB record 100 from WFDB tests).
+    demo = next((rec for rec in recs if rec.get("record_name") == "SYNTH-DEMO-001"), None)
+    assert demo is not None, "Synthetic demo record not found in records list"
+    rid = demo["id"]
     p = client.post(f"/api/processing/run?record_id={rid}")
     assert p.status_code == 200
     data = p.json()

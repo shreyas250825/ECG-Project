@@ -3,7 +3,7 @@ export const DISCLAIMER =
 
 export function Disclaimer({ compact = false }: { compact?: boolean }) {
   return (
-    <p className={`border border-amber-200 bg-amber-50 text-amber-950 ${compact ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm"}`}>
+    <p className="disclaimer-strip" style={compact ? { fontSize: "0.6875rem" } : {}}>
       {DISCLAIMER}
     </p>
   );
@@ -11,13 +11,9 @@ export function Disclaimer({ compact = false }: { compact?: boolean }) {
 
 export function PrototypeBadges() {
   return (
-    <div className="flex flex-wrap gap-2">
-      <span className="border border-slate-300 bg-white px-2 py-1 text-xs font-semibold tracking-wide text-slate-700">
-        RESEARCH PROTOTYPE
-      </span>
-      <span className="border border-slate-300 bg-white px-2 py-1 text-xs font-semibold tracking-wide text-slate-700">
-        NOT FOR CLINICAL DIAGNOSIS
-      </span>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+      <span className="badge badge-prototype">Research Prototype</span>
+      <span className="badge badge-warning">Not for clinical diagnosis</span>
     </div>
   );
 }

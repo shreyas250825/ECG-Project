@@ -237,8 +237,12 @@ def update_twin(record_id: str, timestamp_s: float | None, window_s: float) -> d
 
 def save_upload(filename: str, content: bytes, cfg_fs: float, signal_col: str, time_col: str | None, lead: str) -> dict:
     suffix = Path(filename).suffix.lower()
-    if suffix != ".csv":
-        raise ResearchError("Initial parser supports CSV. WFDB/EDF can be added when files are present.", "invalid_ecg")
+    if suffix not in (".csv",):
+        raise ResearchError(
+            f"Unsupported file type '{suffix}'. Upload a CSV file, "
+            "or use POST /api/datasets/load to load a WFDB record by name.",
+            "invalid_ecg",
+        )
     signal, fs = parse_csv_bytes(content, cfg_fs, signal_col, time_col)
     row = store.insert_record(
         {

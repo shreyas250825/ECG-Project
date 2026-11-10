@@ -10,11 +10,11 @@ const steps = [
   ["Research question", "Do patient-specific temporal patterns and baseline deviations carry earlier information about an evolving VT-related state?"],
   ["Method", "Quality check → filter → R-peaks → features → baseline → computational twin → experimental forecast."],
   ["Data", "Public or synthetic research recordings with provenance. No fabricated clinical patients."],
-  ["Patient-specific representation", "Baseline window is explicit; deviations are not automatically ‘disease’."],
+  ["Patient-specific representation", "Baseline window is explicit; deviations are not automatically 'disease'."],
   ["Forecasting experiment", "Observation window versus horizon H; labels from annotations only."],
   ["Evaluation", "Metrics appear only after an experiment. Empty otherwise."],
   ["Hardware acceleration", "Optional FIR on PYNQ; software fallback is the default."],
-  ["Limitations", "See the limitations page. Prototype is not a medical device."],
+  ["Limitations", "See the limitations section. Prototype is not a medical device."],
 ];
 
 export default function ExplainPage() {
@@ -22,47 +22,129 @@ export default function ExplainPage() {
   const viz = useMemo(() => ({ ...EMPTY_VISUALIZATION_STATE }), []);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl">Explain to cardiologist</h2>
-      <Disclaimer compact />
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={showViz} onChange={(e) => setShowViz(e.target.checked)} />
-        Show 3D conceptual visualization (illustrative; no ECG loaded on this page)
+    <div>
+      <div style={{ marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, margin: 0 }}>Explain to cardiologist</h2>
+        <p style={{ fontSize: "0.8125rem", color: "var(--color-muted)", marginTop: "0.25rem" }}>
+          A conceptual walkthrough of the research pipeline for clinical context.
+        </p>
+      </div>
+
+      <div style={{ marginBottom: "1.25rem" }}>
+        <Disclaimer compact />
+      </div>
+
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          fontSize: "0.875rem",
+          color: "var(--color-muted)",
+          cursor: "pointer",
+          marginBottom: "1.25rem",
+          userSelect: "none",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={showViz}
+          onChange={(e) => setShowViz(e.target.checked)}
+          style={{ accentColor: "var(--color-teal)", cursor: "pointer" }}
+        />
+        Show 3D conceptual visualization (illustrative — no ECG loaded on this page)
       </label>
-      {showViz && <CardiologistPresentation viz={viz} lastRPeakMs={null} />}
-      <ol className="space-y-3">
+
+      {showViz && <div style={{ marginBottom: "1.25rem" }}><CardiologistPresentation viz={viz} lastRPeakMs={null} /></div>}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1.25rem" }}>
         {steps.map(([t, b], i) => (
-          <li key={t} className="border border-slate-200 bg-white p-4">
-            <p className="text-xs uppercase text-teal-800">
-              {i + 1}. {t}
-            </p>
-            <p className="mt-1">{b}</p>
-          </li>
+          <div
+            key={t}
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-line)",
+              borderRadius: "0.625rem",
+              padding: "0.875rem 1rem",
+              display: "flex",
+              gap: "0.875rem",
+              alignItems: "flex-start",
+            }}
+          >
+            <span
+              style={{
+                minWidth: 24,
+                height: 24,
+                borderRadius: "50%",
+                background: "rgba(13,148,136,0.1)",
+                color: "var(--color-teal-dim)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.6875rem",
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+            >
+              {i + 1}
+            </span>
+            <div>
+              <p style={{ fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-teal-dim)", margin: 0 }}>
+                {t}
+              </p>
+              <p style={{ fontSize: "0.8125rem", color: "var(--color-muted)", margin: "0.25rem 0 0", lineHeight: 1.6 }}>{b}</p>
+            </div>
+          </div>
         ))}
-      </ol>
-      <section className="space-y-2 text-sm">
-        <h3 className="text-lg">Why this is different from an ECG machine</h3>
-        <p>
-          We are not developing a new ECG acquisition device. ECG is the input signal. The research contribution is the
-          computational analysis pipeline above the ECG signal: patient-specific modelling, temporal state representation,
-          experimental forecasting and edge acceleration.
-        </p>
-        <h3 className="text-lg">Why this is different from simple arrhythmia detection</h3>
-        <p>Detection: the event is already happening in the analysed window.</p>
-        <p>Forecasting: estimate future target-event risk from preceding temporal information, for an experimental horizon H.</p>
-        <h3 className="text-lg">Role of the 3D heart</h3>
-        <p>
-          The 3D heart is a visualization layer for ECG-derived computational state. It is not a patient-specific anatomical
-          reconstruction, physiological simulation, or clinical diagnostic model. Live synchronized demo:{" "}
-          <Link className="text-teal-800 underline" to="/dashboard">
-            Research Dashboard
-          </Link>
-          .
-        </p>
-      </section>
-      <Link className="inline-block bg-teal-800 px-4 py-2 text-sm text-white" to="/architecture">
-        Interactive architecture
-      </Link>
+      </div>
+
+      {/* Explanatory prose */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+        {[
+          {
+            title: "Why this is different from an ECG machine",
+            body: "We are not developing a new ECG acquisition device. ECG is the input signal. The research contribution is the computational analysis pipeline above the ECG signal: patient-specific modelling, temporal state representation, experimental forecasting and edge acceleration.",
+          },
+          {
+            title: "Why this is different from simple arrhythmia detection",
+            body: "Detection: the event is already happening in the analysed window. Forecasting: estimate future target-event risk from preceding temporal information, for an experimental horizon H.",
+          },
+          {
+            title: "Role of the 3D heart",
+            body: "The 3D heart is a visualization layer for ECG-derived computational state. It is not a patient-specific anatomical reconstruction, physiological simulation, or clinical diagnostic model.",
+          },
+        ].map(({ title, body }) => (
+          <div
+            key={title}
+            style={{
+              background: "var(--color-bg)",
+              border: "1px solid var(--color-line)",
+              borderRadius: "0.625rem",
+              padding: "0.875rem 1rem",
+            }}
+          >
+            <h3 style={{ fontSize: "0.875rem", fontWeight: 700, margin: "0 0 0.375rem" }}>{title}</h3>
+            <p style={{ fontSize: "0.8125rem", color: "var(--color-muted)", margin: 0, lineHeight: 1.65 }}>{body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <Link
+          to="/research/architecture"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.375rem",
+            fontSize: "0.875rem",
+            color: "var(--color-teal)",
+            textDecoration: "none",
+            fontWeight: 600,
+          }}
+        >
+          View interactive architecture →
+        </Link>
+      </div>
     </div>
   );
 }

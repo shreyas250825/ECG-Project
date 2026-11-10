@@ -1,4 +1,5 @@
 from fastapi import APIRouter, File, Form, UploadFile
+from pydantic import BaseModel
 
 from app.core.config import settings
 from app.db.store import store
@@ -22,8 +23,16 @@ from app.services.analysis import (
 )
 from app.services.ml import run_forecast, train_models
 from app.services.pipeline import STAGES
+from app.datasets.ingestion import get_dataset_records, load_and_ingest, _data_root
 
 router = APIRouter()
+
+
+class DatasetLoadRequest(BaseModel):
+    dataset: str
+    record_name: str
+    lead_index: int = 0
+    max_samples: int | None = None  # None → default 1 hr at native fs
 
 
 @router.get("/health")
@@ -238,4 +247,66 @@ def scope():
             "Cardiac arrest is a clinical endpoint, whereas ventricular arrhythmias are abnormal cardiac rhythms "
             "that may contribute to cardiac arrest. This project focuses on ventricular-arrhythmia-related ECG analysis."
         ),
+    }
+
+
+# ── Dataset / WFDB endpoints ──────────────────────────────────────────────────
+
+SUPPORTED_DATASETS = ["mitdb", "sddb"]
+
+
+@router.get("/datasets")
+def datasets_list():
+    """List all datasets that have data on disk under settings.wfdb_data_dir or settings.data_dir."""
+    result = []
+    for ds in SUPPORTED_DATASETS:
+        records = get_dataset_records(ds)
+        result.append({
+            "dataset": ds,
+            "record_count": len(records),
+            "records_on_disk": len(records),
+            "records": records,
+        })
+    return {"datasets": result, "disclaimer": DISCLAIMER}
+
+
+@router.get("/datasets/{dataset}")
+def dataset_detail(dataset: str):
+    """List available records for a single dataset."""
+    if dataset not in SUPPORTED_DATASETS:
+        return {"error": "unknown_dataset", "message": f"Dataset '{dataset}' not supported. Choose from {SUPPORTED_DATASETS}."}
+    records = get_dataset_records(dataset)
+    return {
+        "dataset": dataset,
+        "record_count": len(records),
+        "records": records,
+        "disclaimer": DISCLAIMER,
+    }
+
+
+@router.post("/datasets/load")
+def dataset_load(body: DatasetLoadRequest):
+    """
+    Load a specific WFDB record from disk into MemoryStore.
+    The record becomes immediately available via GET /api/records and
+    POST /api/processing/run.
+    """
+    if body.dataset not in SUPPORTED_DATASETS:
+        return {
+            "error": "unknown_dataset",
+            "message": f"Dataset '{body.dataset}' not supported. Choose from {SUPPORTED_DATASETS}.",
+        }
+    row = load_and_ingest(
+        dataset=body.dataset,
+        record_name=body.record_name,
+        lead_index=body.lead_index,
+        max_samples=body.max_samples,
+    )
+    return {
+        "record": row,
+        "message": (
+            f"Record {body.dataset}/{body.record_name} loaded successfully. "
+            "Use the returned record id with POST /api/processing/run to analyse it."
+        ),
+        "disclaimer": DISCLAIMER,
     }

@@ -5,12 +5,57 @@ type Props = {
   viz: CardiacVisualizationState;
 };
 
+function formatTarget(t: string) {
+  if (t.toLowerCase() === "vt") return "Ventricular tachyarrhythmia / VT";
+  return t;
+}
+
+function Field({ label, value, wide }: { label: string; value: string; wide?: boolean }) {
+  return (
+    <div
+      style={{
+        gridColumn: wide ? "1 / -1" : undefined,
+        background: "var(--color-bg)",
+        border: "1px solid var(--color-line)",
+        borderRadius: "0.5rem",
+        padding: "0.625rem 0.75rem",
+      }}
+    >
+      <p style={{ fontSize: "0.5625rem", fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--color-muted)", margin: 0 }}>
+        {label}
+      </p>
+      <p style={{ fontSize: "0.875rem", fontWeight: 500, margin: "0.25rem 0 0", color: "var(--color-ink)" }}>{value}</p>
+    </div>
+  );
+}
+
 export function ForecastExperimentPanel({ viz }: Props) {
   return (
-    <section className="border border-slate-200 bg-white p-4">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Forecasting experiment</h3>
-      <Disclaimer compact />
-      <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+    <section
+      style={{
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-line)",
+        borderRadius: "0.75rem",
+        padding: "1.125rem",
+      }}
+    >
+      <div style={{ marginBottom: "0.875rem" }}>
+        <p style={{ fontSize: "0.6875rem", fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--color-muted)", margin: 0 }}>
+          Forecasting experiment
+        </p>
+      </div>
+
+      <div style={{ marginBottom: "0.875rem" }}>
+        <Disclaimer compact />
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          gap: "0.625rem",
+        }}
+      >
         <Field label="Target" value={viz.forecastTarget ? formatTarget(viz.forecastTarget) : "—"} />
         <Field
           label="Observation window"
@@ -41,24 +86,11 @@ export function ForecastExperimentPanel({ viz }: Props) {
         />
         <Field label="Status detail" value={viz.forecastStatus} wide />
       </div>
-      <p className="mt-3 text-xs text-slate-500">
-        Research prototype only. Model outputs are experimental estimates and are not clinical diagnoses. Numerical
-        forecast fields remain the evidence; the 3D heart is only a visual emphasis.
+
+      <p style={{ fontSize: "0.6875rem", color: "var(--color-muted)", marginTop: "0.75rem" }}>
+        Research prototype only. Model outputs are experimental estimates. Numerical forecast fields remain the evidence;
+        the 3D heart is only a visual emphasis.
       </p>
     </section>
-  );
-}
-
-function formatTarget(t: string) {
-  if (t.toLowerCase() === "vt") return "Ventricular tachyarrhythmia / VT";
-  return t;
-}
-
-function Field({ label, value, wide }: { label: string; value: string; wide?: boolean }) {
-  return (
-    <div className={wide ? "sm:col-span-2 lg:col-span-3" : ""}>
-      <p className="text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-0.5 text-slate-800">{value}</p>
-    </div>
   );
 }

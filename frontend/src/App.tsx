@@ -1,42 +1,49 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
-import AboutPage from "./pages/AboutPage";
+import OverviewPage from "./pages/OverviewPage";
 import AnalysisPage from "./pages/AnalysisPage";
-import ArchitecturePage from "./pages/ArchitecturePage";
-import DashboardPage from "./pages/DashboardPage";
-import DatasetsPage from "./pages/DatasetsPage";
-import ExplainPage from "./pages/ExplainPage";
-import ForecastPage from "./pages/ForecastPage";
-import HardwarePage from "./pages/HardwarePage";
-import LandingPage from "./pages/LandingPage";
-import LimitationsPage from "./pages/LimitationsPage";
-import MethodologyPage from "./pages/MethodologyPage";
-import PipelinePage from "./pages/PipelinePage";
-import ReplayPage from "./pages/ReplayPage";
-import ResultsPage from "./pages/ResultsPage";
-import ScopePage from "./pages/ScopePage";
 import TwinPage from "./pages/TwinPage";
+import ForecastPage from "./pages/ForecastPage";
+import ResearchLabPage from "./pages/ResearchLabPage";
+import type { LabTab } from "./pages/ResearchLabPage";
 
 export default function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/pipeline" element={<PipelinePage />} />
+        {/* ── Primary nav ─────────────────────────────────────── */}
+        <Route path="/" element={<OverviewPage />} />
         <Route path="/analysis" element={<AnalysisPage />} />
         <Route path="/twin" element={<TwinPage />} />
         <Route path="/forecast" element={<ForecastPage />} />
-        <Route path="/datasets" element={<DatasetsPage />} />
-        <Route path="/results" element={<ResultsPage />} />
-        <Route path="/hardware" element={<HardwarePage />} />
-        <Route path="/methodology" element={<MethodologyPage />} />
-        <Route path="/scope" element={<ScopePage />} />
-        <Route path="/limitations" element={<LimitationsPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/explain" element={<ExplainPage />} />
-        <Route path="/architecture" element={<ArchitecturePage />} />
-        <Route path="/replay" element={<ReplayPage />} />
+        <Route path="/research" element={<ResearchLabPage />} />
+
+        {/* Research Lab internal deep-links */}
+        <Route path="/research/pipeline"    element={<ResearchLabPage tab={"pipeline" as LabTab} />} />
+        <Route path="/research/recordings"  element={<ResearchLabPage tab={"recordings" as LabTab} />} />
+        <Route path="/research/results"     element={<ResearchLabPage tab={"results" as LabTab} />} />
+        <Route path="/research/replay"      element={<ResearchLabPage tab={"replay" as LabTab} />} />
+        <Route path="/research/hardware"    element={<ResearchLabPage tab={"hardware" as LabTab} />} />
+        <Route path="/research/methodology" element={<ResearchLabPage tab={"methodology" as LabTab} />} />
+        <Route path="/research/scope"       element={<ResearchLabPage tab={"scope" as LabTab} />} />
+        <Route path="/research/limitations" element={<ResearchLabPage tab={"limitations" as LabTab} />} />
+        <Route path="/research/about"       element={<ResearchLabPage tab={"about" as LabTab} />} />
+        <Route path="/research/explain"     element={<ResearchLabPage tab={"explain" as LabTab} />} />
+        <Route path="/research/architecture" element={<ResearchLabPage tab={"architecture" as LabTab} />} />
+
+        {/* ── Legacy redirects ─────────────────────────────── */}
+        <Route path="/dashboard"    element={<Navigate to="/" replace />} />
+        <Route path="/datasets"     element={<Navigate to="/research/recordings" replace />} />
+        <Route path="/results"      element={<Navigate to="/research/results" replace />} />
+        <Route path="/hardware"     element={<Navigate to="/research/hardware" replace />} />
+        <Route path="/methodology"  element={<Navigate to="/research/methodology" replace />} />
+        <Route path="/scope"        element={<Navigate to="/research/scope" replace />} />
+        <Route path="/limitations"  element={<Navigate to="/research/limitations" replace />} />
+        <Route path="/about"        element={<Navigate to="/research/about" replace />} />
+        <Route path="/explain"      element={<Navigate to="/research/explain" replace />} />
+        <Route path="/pipeline"     element={<Navigate to="/research/pipeline" replace />} />
+        <Route path="/replay"       element={<Navigate to="/research/replay" replace />} />
+        <Route path="/architecture" element={<Navigate to="/research/architecture" replace />} />
       </Route>
     </Routes>
   );

@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     data_dir: str = "./data"
     model_dir: str = "./backend/models"
     sample_data_dir: str = "./data/sample"
+    # Root directory containing physionet mirror: <wfdb_data_dir>/mitdb/1.0.0/*.hea
+    # Defaults to data_dir if not explicitly set.
+    wfdb_data_dir: str = ""
 
     supabase_url: str = ""
     supabase_key: str = ""

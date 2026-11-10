@@ -66,4 +66,13 @@ export const api = {
     fd.append("lead", lead);
     return parse(await fetch(`${API}/ecg/upload`, { method: "POST", body: fd }));
   },
+  // ── Dataset / WFDB endpoints ─────────────────────────────────────────────
+  datasets: () => fetch(`${API}/datasets`).then(parse),
+  datasetDetail: (dataset: string) => fetch(`${API}/datasets/${encodeURIComponent(dataset)}`).then(parse),
+  loadDatasetRecord: (body: { dataset: string; record_name: string; lead_index?: number; max_samples?: number | null }) =>
+    fetch(`${API}/datasets/load`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(parse),
 };
