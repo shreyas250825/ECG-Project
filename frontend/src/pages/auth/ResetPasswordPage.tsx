@@ -41,26 +41,31 @@ export default function ResetPasswordPage() {
 
   /* Supabase sends a recovery event when the user clicks the email link */
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
-    });
-
-    /* Also check for hash fragments — Supabase can deliver the token via URL hash */
+    // Check URL hash immediately — Supabase v2 delivers token via hash fragment
     const hash = window.location.hash;
     if (hash.includes("type=recovery") || hash.includes("access_token")) {
       setReady(true);
+      return;
     }
 
-    /* Timeout: if no recovery event within 10s, consider link invalid */
+    // Also listen for the PASSWORD_RECOVERY auth event
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setReady(true);
+      }
+    });
+
+    // If neither the hash nor the event fires within 10 s, the link is invalid/expired
     const timer = setTimeout(() => {
-      setInvalid((prev) => !prev && !ready);
+      setInvalid(true);
     }, 10000);
 
     return () => {
       subscription.unsubscribe();
       clearTimeout(timer);
     };
-  }, [ready]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

@@ -97,9 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } as any, { onConflict: "id", ignoreDuplicates: true });
     }
 
-    const needsConfirmation =
-      data.user != null &&
-      data.user.identities?.length === 0;
+    // needsConfirmation: user was created but no session yet (email confirmation required)
+    // identities.length === 0 means the email already exists (Supabase duplicate signal)
+    const isDuplicate       = data.user?.identities?.length === 0;
+    const needsConfirmation = !isDuplicate && data.user != null && data.session == null;
 
     return { error: null, needsConfirmation };
   }, []);

@@ -21,6 +21,12 @@ export async function saveTwinState(
 ): Promise<{ id: string | null; error: string | null }> {
   if (!supabaseConfigured) return { id: null, error: null };
 
+  // Guard: skip if recording not in Supabase (avoids FK violation)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: recCheck } = await (supabase as any)
+    .from("recordings").select("id").eq("id", recordingId).maybeSingle();
+  if (!recCheck) return { id: null, error: null };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("digital_twin_states")

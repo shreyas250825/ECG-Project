@@ -546,3 +546,59 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.025em; line-height: 1.25; 
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ══════════════════════════════════════════════════════
+   OVERFLOW PREVENTION
+══════════════════════════════════════════════════════ */
+
+/* Prevent anything from causing horizontal scroll */
+html, body { overflow-x: hidden; }
+
+.page-content { overflow-x: hidden; }
+
+/* Auth left panel: use CSS property directly so media query can override it */
+/* (The inline style display:flex is overridden by !important in the media query) */
+@media (min-width: 769px) {
+  .auth-left-panel { display: flex !important; }
+  .auth-mobile-logo { display: none !important; }
+}
+
+/* On very small screens make buttons not overflow */
+@media (max-width: 360px) {
+  .btn-primary, .btn-secondary {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Prevent Three.js canvas from causing overflow */
+canvas { display: block; max-width: 100%; }
+
+/* Ensure inputs don't trigger zoom on iOS (font-size >= 16px) */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 1rem !important;
+  }
+}
+
+/* Research Lab tabs: allow horizontal scroll on small screens */
+@media (max-width: 600px) {
+  .lab-tab-bar {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 0.25rem;
+    padding-bottom: 2px; /* prevent scrollbar overlap */
+  }
+  .lab-tab-btn {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}

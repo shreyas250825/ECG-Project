@@ -29,6 +29,20 @@ export async function saveAnalysis(
 ): Promise<{ id: string | null; error: string | null }> {
   if (!supabaseConfigured) return { id: null, error: null };
 
+  // Verify the recording exists in Supabase before inserting (avoids FK violation
+  // when the recording only exists in the FastAPI in-memory store)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: recCheck } = await (supabase as any)
+    .from("recordings")
+    .select("id")
+    .eq("id", recordingId)
+    .maybeSingle();
+
+  if (!recCheck) {
+    // Recording not in Supabase — skip persistence silently
+    return { id: null, error: null };
+  }
+
   const sq = apiResult.signal_quality as { score?: number } | undefined;
   const rp = apiResult.r_peaks       as { count?: number } | undefined;
 
