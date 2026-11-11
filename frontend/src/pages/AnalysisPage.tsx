@@ -4,6 +4,8 @@ import { EcgChart } from "../charts/EcgChart";
 import { Disclaimer } from "../components/Disclaimer";
 import { Icon, PageHeader, SectionCard, StatCard, FormField, ErrorBox, Spinner, Collapsible } from "../components/ui";
 import { api } from "../services/api";
+import { saveAnalysis } from "../services/analysisService";
+import { useAuth } from "../contexts/AuthContext";
 import type { ResearchRecord } from "../types/research";
 
 const I = {
@@ -341,6 +343,7 @@ function ResultsPanel({ data }: { data: Record<string, unknown> }) {
 
 /* ── Main page ──────────────────────────────────────────────────────── */
 export default function AnalysisPage() {
+  const { user } = useAuth();
   const recordsQ = useQuery({ queryKey: ["records"], queryFn: api.records });
   const records: ResearchRecord[] = recordsQ.data?.records ?? [];
   const [rid, setRid] = useState<string>("");
@@ -351,7 +354,15 @@ export default function AnalysisPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const selected = rid || records[0]?.id || "";
 
-  const proc = useMutation({ mutationFn: () => api.process(selected) });
+  const proc = useMutation({
+    mutationFn: () => api.process(selected),
+    onSuccess: async (data) => {
+      // Persist analysis to Supabase (best-effort — does not block UI)
+      if (user && selected) {
+        await saveAnalysis(user.id, selected, data as Record<string, unknown>);
+      }
+    },
+  });
   const up = useMutation({
     mutationFn: async () => {
       const f = fileRef.current?.files?.[0];

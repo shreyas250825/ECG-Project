@@ -1,19 +1,15 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  Bar,
-  BarChart,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { Disclaimer } from "../components/Disclaimer";
 import { HeartScene } from "../components/heart3d/HeartScene";
 import { deriveCardiacVisualizationState } from "../components/heart3d/deriveVisualizationState";
 import { Icon, ErrorBox, Spinner, FormField, Collapsible } from "../components/ui";
 import { api } from "../services/api";
+import { saveTwinState } from "../services/digitalTwinService";
+import { useAuth } from "../contexts/AuthContext";
 import type { ResearchRecord } from "../types/research";
 import type { CardiacVisualizationState } from "../components/heart3d/types";
 
@@ -667,6 +663,7 @@ function ControlsBar({
 
 /* ── Main page ───────────────────────────────────────────────────── */
 export default function TwinPage() {
+  const { user } = useAuth();
   const recordsQ = useQuery({ queryKey: ["records"], queryFn: api.records });
   const records: ResearchRecord[] = recordsQ.data?.records ?? [];
   const [rid, setRid] = useState("");
@@ -680,6 +677,11 @@ export default function TwinPage() {
   const tw = useMutation({
     mutationFn: () =>
       api.twin({ record_id: selected, timestamp_s: end, window_s: 20 }),
+    onSuccess: async (data) => {
+      if (user && selected) {
+        await saveTwinState(user.id, selected, data as Record<string, unknown>);
+      }
+    },
   });
 
   const stateVec      = tw.data?.state_vector as Record<string, number> | undefined;
@@ -817,6 +819,7 @@ export default function TwinPage() {
 
       {/* ── Main two-column workspace ─────────────────────────── */}
       <div
+        className="twin-workspace"
         style={{
           display: "grid",
           gridTemplateColumns: "minmax(0, 1.8fr) minmax(0, 1fr)",

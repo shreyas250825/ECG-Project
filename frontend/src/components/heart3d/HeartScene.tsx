@@ -420,9 +420,9 @@ export type HeartSceneProps = {
   viz: CardiacVisualizationState;
   lastRPeakMs: number | null;
   className?: string;
-  /** compact: shorter canvas height (for sidebar / presentation mode) */
+  /** compact: smaller fixed-height canvas (sidebar / presentation) */
   compact?: boolean;
-  /** tall: use a larger canvas height for the Twin page workspace */
+  /** tall: kept for API compatibility, now handled by CSS class */
   tall?: boolean;
 };
 
@@ -431,7 +431,6 @@ function HeartSceneInner({
   lastRPeakMs,
   className,
   compact,
-  tall,
 }: HeartSceneProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const labelsRef = useRef<LabelAnchorsHandle | null>(null);
@@ -464,8 +463,11 @@ function HeartSceneInner({
 
   const canvasStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
 
-  // Canvas height
-  const canvasH = compact ? 260 : tall ? 520 : 400;
+  // `tall` prop kept for API compat — responsive height now handled by CSS
+  const canvasWrapperClass = compact ? undefined : "heart-canvas-wrapper";
+  const canvasWrapperStyle: React.CSSProperties = compact
+    ? { position: "relative", width: "100%", height: 260 }
+    : {};
 
   const vizStateColor = VIZ_STATE_COLOR[viz.vizState] ?? "#94A3B8";
 
@@ -558,11 +560,12 @@ function HeartSceneInner({
 
       {/* ── 3D Canvas + label overlay ────────────────────────────── */}
       <div
+        className={canvasWrapperClass ? `${canvasWrapperClass} heart-canvas-touch` : "heart-canvas-touch"}
         style={{
           position: "relative",
           width: "100%",
-          height: canvasH,
           flexShrink: 0,
+          ...canvasWrapperStyle,
         }}
       >
         {webglFailed ? (

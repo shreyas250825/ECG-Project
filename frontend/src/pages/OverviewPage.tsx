@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api } from "../services/api";
+import { getRecentAnalyses } from "../services/analysisService";
+import { getRecentForecasts } from "../services/forecastService";
+import { useAuth } from "../contexts/AuthContext";
 import type { ResearchRecord } from "../types/research";
 import { Icon, EmptyState } from "../components/ui";
 
@@ -169,17 +172,21 @@ function HeroSection() {
   );
 }
 
-function SnapshotStats({ records }: { records: ResearchRecord[] }) {
+function SnapshotStats({ records, analysesCount, forecastsCount }: {
+  records: ResearchRecord[];
+  analysesCount: number;
+  forecastsCount: number;
+}) {
   const total      = records.length;
   const real       = records.filter((r) => !r.synthetic).length;
   const synth      = records.filter((r) => r.synthetic).length;
-  const annotated  = records.filter((r) => r.has_annotations).length;
 
   const items = [
-    { label: "Loaded",      value: total     ? String(total)     : "—", sub: "recordings" },
-    { label: "Real data",   value: real      ? String(real)      : "—", sub: "from datasets" },
-    { label: "Synthetic",   value: synth     ? String(synth)     : "—", sub: "demo / test" },
-    { label: "Annotated",   value: annotated ? String(annotated) : "—", sub: "labelled events" },
+    { label: "Loaded",      value: total      ? String(total)         : "—", sub: "recordings" },
+    { label: "Real data",   value: real       ? String(real)          : "—", sub: "from datasets" },
+    { label: "Synthetic",   value: synth      ? String(synth)         : "—", sub: "demo / test" },
+    { label: "Analyses",    value: analysesCount  ? String(analysesCount)  : "—", sub: "completed" },
+    { label: "Forecasts",   value: forecastsCount ? String(forecastsCount) : "—", sub: "experiments" },
   ];
 
   return (
@@ -665,16 +672,30 @@ function PipelineOverview() {
 
 /* ── Overview page ──────────────────────────────────────────────────── */
 export default function OverviewPage() {
-  const recordsQ = useQuery({ queryKey: ["records"], queryFn: api.records });
+  const { user } = useAuth();
+  const recordsQ   = useQuery({ queryKey: ["records"],         queryFn: api.records });
+  const analysesQ  = useQuery({ queryKey: ["recent-analyses"], queryFn: () => getRecentAnalyses(5) });
+  const forecastsQ = useQuery({ queryKey: ["recent-forecasts"],queryFn: () => getRecentForecasts(5) });
   const records: ResearchRecord[] = recordsQ.data?.records ?? [];
+
+  const analysesCount  = analysesQ.data?.length  ?? 0;
+  const forecastsCount = forecastsQ.data?.length ?? 0;
+  const displayName    = user?.user_metadata?.full_name
+    ? (user.user_metadata.full_name as string).split(" ")[0]
+    : null;
 
   return (
     <div className="fade-in">
+      {displayName && (
+        <p style={{ fontSize: "0.9375rem", color: "var(--color-muted)", marginBottom: "0.5rem" }}>
+          Welcome back, <strong style={{ color: "var(--color-ink)" }}>{displayName}</strong>
+        </p>
+      )}
       <HeroSection />
 
-      <SnapshotStats records={records} />
+      <SnapshotStats records={records} analysesCount={analysesCount} forecastsCount={forecastsCount} />
 
-      {/* Two-column middle section */}
+      {/* Two-column middle section — collapses to single on mobile */}
       <div
         style={{
           display: "grid",
@@ -683,18 +704,20 @@ export default function OverviewPage() {
           marginBottom: "1.25rem",
           alignItems: "start",
         }}
+        className="responsive-two-col"
       >
         <GuidedWorkflow recordsExist={records.length > 0} />
         <RecentRecordings records={records} />
       </div>
 
-      {/* Bottom row */}
+      {/* Bottom row — collapses on mobile */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.2fr)",
           gap: "1.25rem",
         }}
+        className="responsive-two-col"
       >
         <ResearchQuestions />
         <PipelineOverview />

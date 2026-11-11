@@ -1,235 +1,353 @@
+import { useState, useCallback } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useUI } from "../stores/ui";
+import { useAuth } from "../contexts/AuthContext";
 
-/* ── Icon primitives (inline SVG, no external dep) ───────────────────── */
+/* ── Inline icon helper ───────────────────────────────────────────── */
 function Icon({ d, size = 16 }: { d: string; size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round">
       <path d={d} />
     </svg>
   );
 }
 
-const ICONS = {
-  overview:    "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
-  ecg:         "M22 12h-4l-3 9L9 3l-3 9H2",
-  twin:        "M12 2a10 10 0 100 20A10 10 0 0012 2zm0 0v20M2 12h20",
-  forecast:    "M2 12l3-3 4 4 4-7 4 4 3-3M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12",
-  lab:         "M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18",
-  settings:    "M12 15a3 3 0 100-6 3 3 0 000 6zm9-3a9 9 0 11-18 0 9 9 0 0118 0z",
-  help:        "M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01",
-  pulse:       "M3 12h3l3-9 3 18 3-9 3 0",
+const IC = {
+  overview: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+  ecg:      "M22 12h-4l-3 9L9 3l-3 9H2",
+  twin:     "M12 2a10 10 0 100 20A10 10 0 0012 2zm0 0v20M2 12h20",
+  forecast: "M2 12l3-3 4 4 4-7 4 4 3-3M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12",
+  lab:      "M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18",
+  more:     "M4 6h16M4 12h16M4 18h16",
+  close:    "M18 6L6 18M6 6l12 12",
+  pulse:    "M3 12h3l3-9 3 18 3-9 3 0",
+  logout:   "M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1",
+  user:     "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z",
+  explain:  "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
 };
 
-/* ── Nav item ─────────────────────────────────────────────────────────── */
-function SideNavItem({
-  to,
-  icon,
-  label,
-  end,
-}: {
-  to: string;
-  icon: string;
-  label: string;
-  end?: boolean;
-}) {
+/* ── Sidebar desktop nav item ─────────────────────────────────────── */
+function SideNavItem({ to, icon, label, end }: { to: string; icon: string; label: string; end?: boolean }) {
   return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        `sidebar-nav-item${isActive ? " active" : ""}`
-      }
-    >
+    <NavLink to={to} end={end}
+      className={({ isActive }) => `sidebar-nav-item${isActive ? " active" : ""}`}>
       <Icon d={icon} size={15} />
       {label}
     </NavLink>
   );
 }
 
-/* ── Demo mode banner ─────────────────────────────────────────────────── */
-function DemoModeBanner() {
+/* ── Mobile bottom nav item ───────────────────────────────────────── */
+function BottomNavItem({ to, icon, label, end, onClick }: {
+  to?: string; icon: string; label: string; end?: boolean; onClick?: () => void;
+}) {
+  if (!to) {
+    return (
+      <button type="button" onClick={onClick} className="bottom-nav-item">
+        <Icon d={icon} size={20} />
+        <span>{label}</span>
+      </button>
+    );
+  }
   return (
-    <div
-      style={{
-        background: "rgba(99,102,241,0.08)",
-        borderBottom: "1px solid rgba(99,102,241,0.15)",
-        padding: "0.375rem 1.5rem",
-        fontSize: "0.6875rem",
-        color: "rgba(99,102,241,0.9)",
-        fontWeight: 500,
-        letterSpacing: "0.02em",
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-      }}
-    >
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: "currentColor",
-          display: "inline-block",
-          flexShrink: 0,
-        }}
-      />
-      Research Demo Mode — using public / synthetic data
-    </div>
+    <NavLink to={to} end={end}
+      className={({ isActive }) => `bottom-nav-item${isActive ? " active" : ""}`}>
+      <Icon d={icon} size={20} />
+      <span>{label}</span>
+    </NavLink>
   );
 }
 
-/* ── Topbar ───────────────────────────────────────────────────────────── */
-function Topbar() {
-  const { cardiologistMode, demoMode, setCardiologistMode, setDemoMode } = useUI();
+/* ── Mobile drawer (slide-in) ────────────────────────────────────── */
+function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { signOut, user, configured } = useAuth();
   const navigate = useNavigate();
+
+  const LAB_TABS = [
+    { to: "/research/pipeline",    label: "Pipeline" },
+    { to: "/research/recordings",  label: "Recordings" },
+    { to: "/research/results",     label: "Results" },
+    { to: "/research/replay",      label: "Replay" },
+    { to: "/research/hardware",    label: "Hardware" },
+    { to: "/research/methodology", label: "Methodology" },
+    { to: "/research/scope",       label: "Scope & Limitations" },
+    { to: "/research/about",       label: "About & People" },
+    { to: "/research/explain",     label: "Explain" },
+    { to: "/research/architecture",label: "Architecture" },
+  ];
+
+  async function handleLogout() {
+    await signOut();
+    navigate("/login", { replace: true });
+    onClose();
+  }
 
   return (
     <>
-      {demoMode && <DemoModeBanner />}
-      <div className="topbar">
-        {/* breadcrumb / context — kept empty; pages set their own h1 */}
+      {/* Backdrop */}
+      {open && (
+        <div
+          onClick={onClose}
+          style={{
+            position: "fixed", inset: 0, zIndex: 59,
+            background: "rgba(0,0,0,0.45)",
+            backdropFilter: "blur(2px)",
+          }}
+        />
+      )}
+      {/* Drawer */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: "min(300px, 85vw)",
+          background: "#0C1525",
+          zIndex: 60,
+          transform: open ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)",
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+        }}
+      >
+        {/* Drawer header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1rem 1.125rem", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <div style={{ width: 26, height: 26, borderRadius: "0.4rem", background: "linear-gradient(135deg, #0D9488, #0F766E)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon d={IC.pulse} size={13} />
+            </div>
+            <span style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#fff" }}>Cardiac Digital Twin</span>
+          </div>
+          <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: 4 }}>
+            <Icon d={IC.close} size={18} />
+          </button>
+        </div>
+
+        {/* User info */}
+        {configured && user && (
+          <div style={{ padding: "0.875rem 1.125rem", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", gap: "0.625rem", alignItems: "center" }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(13,148,136,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Icon d={IC.user} size={15} />
+            </div>
+            <div style={{ overflow: "hidden" }}>
+              <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "#fff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {user.user_metadata?.full_name ?? user.email?.split("@")[0] ?? "Researcher"}
+              </p>
+              <p style={{ fontSize: "0.625rem", color: "rgba(255,255,255,0.35)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {user.email}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Research Lab section */}
+        <div style={{ padding: "0.75rem 0.75rem 0.5rem" }}>
+          <p style={{ fontSize: "0.5625rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.22)", padding: "0 0.375rem 0.375rem" }}>Research Lab</p>
+          {LAB_TABS.map((t) => (
+            <NavLink key={t.to} to={t.to} onClick={onClose}
+              className={({ isActive }) => `sidebar-nav-item${isActive ? " active" : ""}`}
+              style={{ marginBottom: 2 }}>
+              {t.label}
+            </NavLink>
+          ))}
+        </div>
+
         <div style={{ flex: 1 }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          {/* Cardiologist explain — now a quiet button */}
-          <button
-            type="button"
-            className="btn-ghost"
-            title="Explain to cardiologist"
-            onClick={() => navigate("/research/explain")}
-            style={{ fontSize: "0.75rem" }}
-          >
-            <Icon d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" size={14} />
-            Explain
-          </button>
-
-          {/* Demo mode toggle */}
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.375rem",
-              fontSize: "0.75rem",
-              color: "var(--color-muted)",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={demoMode}
-              onChange={(e) => setDemoMode(e.target.checked)}
-              style={{ accentColor: "var(--color-teal)", cursor: "pointer" }}
-            />
-            Demo
-          </label>
-
-          {/* Cardiologist mode toggle */}
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.375rem",
-              fontSize: "0.75rem",
-              color: "var(--color-muted)",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={cardiologistMode}
-              onChange={(e) => setCardiologistMode(e.target.checked)}
-              style={{ accentColor: "var(--color-teal)", cursor: "pointer" }}
-            />
-            Cardiologist view
-          </label>
+        {/* Explain link */}
+        <div style={{ padding: "0.5rem 0.75rem", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <NavLink to="/research/explain" onClick={onClose} className="sidebar-nav-item">
+            <Icon d={IC.explain} size={14} />
+            Explain to cardiologist
+          </NavLink>
         </div>
+
+        {/* Logout */}
+        {configured && (
+          <div style={{ padding: "0.5rem 0.75rem 1.5rem", paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+            <button type="button" onClick={handleLogout}
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem", width: "100%", padding: "0.5rem 0.625rem", borderRadius: "0.5rem", border: "none", background: "rgba(239,68,68,0.1)", color: "#F87171", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 500 }}>
+              <Icon d={IC.logout} size={14} />
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
 }
 
-/* ── App Layout ───────────────────────────────────────────────────────── */
-export default function AppLayout() {
+/* ── Demo mode banner ─────────────────────────────────────────────── */
+function DemoModeBanner() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* ── Sidebar ────────────────────────────────────────────────── */}
-      <aside className="sidebar">
-        {/* Logo / product identity */}
-        <div className="sidebar-logo">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: "0.4375rem",
-                background: "linear-gradient(135deg, #0D9488 0%, #0F766E 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <Icon d={ICONS.pulse} size={14} />
-            </div>
-            <div>
-              <p
-                style={{
-                  fontSize: "0.8125rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.2,
-                }}
-              >
-                Cardiac Digital Twin
-              </p>
-            </div>
-          </div>
-          {/* Badges */}
-          <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.3125rem", flexWrap: "wrap" }}>
-            <span className="badge badge-prototype" style={{ fontSize: "0.5625rem" }}>Research</span>
-            <span className="badge badge-warning" style={{ fontSize: "0.5625rem" }}>Non-clinical</span>
-          </div>
+    <div style={{ background: "rgba(99,102,241,0.08)", borderBottom: "1px solid rgba(99,102,241,0.15)", padding: "0.3125rem 1.25rem", fontSize: "0.6875rem", color: "rgba(99,102,241,0.9)", fontWeight: 500, letterSpacing: "0.02em", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <span style={{ width: 5, height: 5, borderRadius: "50%", background: "currentColor", display: "inline-block", flexShrink: 0 }} />
+      Research Demo Mode — public / synthetic data
+    </div>
+  );
+}
+
+/* ── Topbar ───────────────────────────────────────────────────────── */
+function Topbar({ onMenuOpen }: { onMenuOpen: () => void }) {
+  const { cardiologistMode, demoMode, setCardiologistMode, setDemoMode } = useUI();
+  const { signOut, user, configured } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await signOut();
+    navigate("/login", { replace: true });
+  }
+
+  return (
+    <>
+      {demoMode && <DemoModeBanner />}
+      <div className="topbar">
+        {/* Mobile: hamburger */}
+        <button type="button" onClick={onMenuOpen} className="topbar-menu-btn" aria-label="Open menu">
+          <Icon d={IC.more} size={20} />
+        </button>
+
+        <div style={{ flex: 1 }} />
+
+        {/* Desktop controls */}
+        <div className="topbar-desktop-controls">
+          <button type="button" className="btn-ghost" title="Explain to cardiologist"
+            onClick={() => navigate("/research/explain")} style={{ fontSize: "0.75rem" }}>
+            <Icon d={IC.explain} size={14} />
+            Explain
+          </button>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem", color: "var(--color-muted)", cursor: "pointer", userSelect: "none" }}>
+            <input type="checkbox" checked={demoMode} onChange={(e) => setDemoMode(e.target.checked)} style={{ accentColor: "var(--color-teal)", cursor: "pointer" }} />
+            Demo
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem", color: "var(--color-muted)", cursor: "pointer", userSelect: "none" }}>
+            <input type="checkbox" checked={cardiologistMode} onChange={(e) => setCardiologistMode(e.target.checked)} style={{ accentColor: "var(--color-teal)", cursor: "pointer" }} />
+            Cardiologist
+          </label>
         </div>
 
-        {/* Nav */}
-        <nav className="sidebar-nav">
-          <SideNavItem to="/" icon={ICONS.overview} label="Overview" end />
-          <SideNavItem to="/analysis" icon={ICONS.ecg} label="ECG Analysis" />
-          <SideNavItem to="/twin" icon={ICONS.twin} label="Digital Twin" />
-          <SideNavItem to="/forecast" icon={ICONS.forecast} label="Forecasting" />
+        {/* User avatar / logout (desktop) */}
+        {configured && user && (
+          <div className="topbar-user">
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(13,148,136,0.1)", border: "1px solid rgba(13,148,136,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Icon d={IC.user} size={13} />
+            </div>
+            <span style={{ fontSize: "0.75rem", color: "var(--color-muted)", maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {user.user_metadata?.full_name ?? user.email?.split("@")[0]}
+            </span>
+            <button type="button" onClick={handleLogout} className="btn-ghost" style={{ fontSize: "0.75rem", color: "#EF4444" }} title="Sign out">
+              <Icon d={IC.logout} size={14} />
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
 
-          <p className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>
-            Research Lab
+/* ── Sidebar (desktop) ────────────────────────────────────────────── */
+function Sidebar() {
+  const { signOut, user, configured } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await signOut();
+    navigate("/login", { replace: true });
+  }
+
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-logo">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{ width: 28, height: 28, borderRadius: "0.4375rem", background: "linear-gradient(135deg, #0D9488 0%, #0F766E 100%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Icon d={IC.pulse} size={14} />
+          </div>
+          <p style={{ fontSize: "0.8125rem", fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2, margin: 0 }}>
+            Cardiac Digital Twin
           </p>
-          <SideNavItem to="/research" icon={ICONS.lab} label="Research Lab" />
-        </nav>
-
-        <div className="sidebar-footer">
-          Personalized cardiac intelligence<br />
-          through ECG analysis &amp; modelling
         </div>
-      </aside>
+        <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.3125rem", flexWrap: "wrap" }}>
+          <span className="badge badge-prototype" style={{ fontSize: "0.5625rem" }}>Research</span>
+          <span className="badge badge-warning"   style={{ fontSize: "0.5625rem" }}>Non-clinical</span>
+        </div>
+      </div>
 
-      {/* ── Main area ──────────────────────────────────────────────── */}
+      <nav className="sidebar-nav">
+        <SideNavItem to="/"        icon={IC.overview} label="Overview"     end />
+        <SideNavItem to="/analysis"icon={IC.ecg}      label="ECG Analysis"    />
+        <SideNavItem to="/twin"    icon={IC.twin}     label="Digital Twin"    />
+        <SideNavItem to="/forecast"icon={IC.forecast} label="Forecasting"     />
+        <p className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>Research Lab</p>
+        <SideNavItem to="/research"icon={IC.lab}      label="Research Lab"    />
+      </nav>
+
+      {/* User info at bottom */}
+      {configured && user && (
+        <div style={{ padding: "0.75rem 0.875rem", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+            <div style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(13,148,136,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Icon d={IC.user} size={12} />
+            </div>
+            <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+              {user.user_metadata?.full_name ?? user.email?.split("@")[0]}
+            </span>
+          </div>
+          <button type="button" onClick={handleLogout}
+            style={{ display: "flex", alignItems: "center", gap: "0.375rem", width: "100%", padding: "0.375rem 0.5rem", borderRadius: "0.375rem", border: "none", background: "rgba(239,68,68,0.08)", color: "#F87171", cursor: "pointer", fontSize: "0.75rem", fontWeight: 500 }}>
+            <Icon d={IC.logout} size={12} />
+            Sign out
+          </button>
+        </div>
+      )}
+
+      <div className="sidebar-footer">
+        Personalized cardiac intelligence<br />
+        through ECG analysis &amp; modelling
+      </div>
+    </aside>
+  );
+}
+
+/* ── Bottom navigation bar (mobile) ──────────────────────────────── */
+function BottomNav({ onMoreClick }: { onMoreClick: () => void }) {
+  return (
+    <nav className="bottom-nav" aria-label="Primary navigation">
+      <BottomNavItem to="/"         icon={IC.overview} label="Overview"  end />
+      <BottomNavItem to="/analysis" icon={IC.ecg}      label="ECG"            />
+      <BottomNavItem to="/twin"     icon={IC.twin}     label="Twin"           />
+      <BottomNavItem to="/forecast" icon={IC.forecast} label="Forecast"       />
+      <BottomNavItem               icon={IC.more}     label="More"  onClick={onMoreClick} />
+    </nav>
+  );
+}
+
+/* ── App Layout ───────────────────────────────────────────────────── */
+export default function AppLayout() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const openDrawer  = useCallback(() => setDrawerOpen(true),  []);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+
+  return (
+    <div className="app-shell-layout">
+      {/* Desktop sidebar */}
+      <Sidebar />
+
+      {/* Mobile slide-in drawer */}
+      <MobileDrawer open={drawerOpen} onClose={closeDrawer} />
+
+      {/* Main content area */}
       <div className="main-area">
-        <Topbar />
+        <Topbar onMenuOpen={openDrawer} />
         <main className="page-content">
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile bottom navigation */}
+      <BottomNav onMoreClick={openDrawer} />
     </div>
   );
 }

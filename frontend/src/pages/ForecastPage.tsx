@@ -4,6 +4,8 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { Disclaimer } from "../components/Disclaimer";
 import { Icon, PageHeader, SectionCard, StatCard, ErrorBox, Spinner, FormField } from "../components/ui";
 import { api } from "../services/api";
+import { saveForecast } from "../services/forecastService";
+import { useAuth } from "../contexts/AuthContext";
 import type { ResearchRecord } from "../types/research";
 
 const HORIZONS = [5, 10, 20, 30];
@@ -251,6 +253,7 @@ function ForecastConcept({ obsMin, hMin }: { obsMin: number; hMin: number }) {
 
 /* ── Main page ───────────────────────────────────────────────────────── */
 export default function ForecastPage() {
+  const { user } = useAuth();
   const recordsQ = useQuery({ queryKey: ["records"], queryFn: api.records });
   const records: ResearchRecord[] = recordsQ.data?.records ?? [];
   const [rid, setRid] = useState("");
@@ -278,6 +281,15 @@ export default function ForecastPage() {
         horizon_s: hMin * 60,
         target_event: "vt",
       }),
+    onSuccess: async (data) => {
+      if (user && selected) {
+        await saveForecast(user.id, selected, data as Record<string, unknown>, {
+          modelName: "logistic_regression",
+          observationWindow: obsMin * 60,
+          predictionHorizon: hMin * 60,
+        });
+      }
+    },
   });
 
   return (
