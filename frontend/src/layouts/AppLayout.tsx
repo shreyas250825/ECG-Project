@@ -65,16 +65,16 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
   const navigate = useNavigate();
 
   const LAB_TABS = [
-    { to: "/research/pipeline",    label: "Pipeline" },
-    { to: "/research/recordings",  label: "Recordings" },
-    { to: "/research/results",     label: "Results" },
-    { to: "/research/replay",      label: "Replay" },
-    { to: "/research/hardware",    label: "Hardware" },
-    { to: "/research/methodology", label: "Methodology" },
-    { to: "/research/scope",       label: "Scope & Limitations" },
-    { to: "/research/about",       label: "About & People" },
-    { to: "/research/explain",     label: "Explain" },
-    { to: "/research/architecture",label: "Architecture" },
+    { to: "/app/research/pipeline",    label: "Pipeline" },
+    { to: "/app/research/recordings",  label: "Recordings" },
+    { to: "/app/research/results",     label: "Results" },
+    { to: "/app/research/replay",      label: "Replay" },
+    { to: "/app/research/hardware",    label: "Hardware" },
+    { to: "/app/research/methodology", label: "Methodology" },
+    { to: "/app/research/scope",       label: "Scope & Limitations" },
+    { to: "/app/research/about",       label: "About & People" },
+    { to: "/app/research/explain",     label: "Explain" },
+    { to: "/app/research/architecture",label: "Architecture" },
   ];
 
   async function handleLogout() {
@@ -159,7 +159,7 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
 
         {/* Explain link */}
         <div style={{ padding: "0.5rem 0.75rem", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-          <NavLink to="/research/explain" onClick={onClose} className="sidebar-nav-item">
+          <NavLink to="/app/research/explain" onClick={onClose} className="sidebar-nav-item">
             <Icon d={IC.explain} size={14} />
             Explain to cardiologist
           </NavLink>
@@ -215,7 +215,7 @@ function Topbar({ onMenuOpen }: { onMenuOpen: () => void }) {
         {/* Desktop controls */}
         <div className="topbar-desktop-controls">
           <button type="button" className="btn-ghost" title="Explain to cardiologist"
-            onClick={() => navigate("/research/explain")} style={{ fontSize: "0.75rem" }}>
+            onClick={() => navigate("/app/research/explain")} style={{ fontSize: "0.75rem" }}>
             <Icon d={IC.explain} size={14} />
             Explain
           </button>
@@ -276,12 +276,12 @@ function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <SideNavItem to="/"        icon={IC.overview} label="Overview"     end />
-        <SideNavItem to="/analysis"icon={IC.ecg}      label="ECG Analysis"    />
-        <SideNavItem to="/twin"    icon={IC.twin}     label="Digital Twin"    />
-        <SideNavItem to="/forecast"icon={IC.forecast} label="Forecasting"     />
+        <SideNavItem to="/app"          icon={IC.overview} label="Overview"     end />
+        <SideNavItem to="/app/ecg"      icon={IC.ecg}      label="ECG Analysis"    />
+        <SideNavItem to="/app/twin"     icon={IC.twin}     label="Digital Twin"    />
+        <SideNavItem to="/app/forecast" icon={IC.forecast} label="Forecasting"     />
         <p className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>Research Lab</p>
-        <SideNavItem to="/research"icon={IC.lab}      label="Research Lab"    />
+        <SideNavItem to="/app/research" icon={IC.lab}      label="Research Lab"    />
       </nav>
 
       {/* User info at bottom */}
@@ -315,10 +315,10 @@ function Sidebar() {
 function BottomNav({ onMoreClick }: { onMoreClick: () => void }) {
   return (
     <nav className="bottom-nav" aria-label="Primary navigation">
-      <BottomNavItem to="/"         icon={IC.overview} label="Overview"  end />
-      <BottomNavItem to="/analysis" icon={IC.ecg}      label="ECG"            />
-      <BottomNavItem to="/twin"     icon={IC.twin}     label="Twin"           />
-      <BottomNavItem to="/forecast" icon={IC.forecast} label="Forecast"       />
+      <BottomNavItem to="/app"          icon={IC.overview} label="Overview"  end />
+      <BottomNavItem to="/app/ecg"      icon={IC.ecg}      label="ECG"            />
+      <BottomNavItem to="/app/twin"     icon={IC.twin}     label="Twin"           />
+      <BottomNavItem to="/app/forecast" icon={IC.forecast} label="Forecast"       />
       <BottomNavItem               icon={IC.more}     label="More"  onClick={onMoreClick} />
     </nav>
   );

@@ -70,7 +70,7 @@ export default function ResearchLabPage({ tab: tabProp }: { tab?: LabTab }) {
 
   const handleTab = (id: LabTab) => {
     setActiveTab(id);
-    navigate(`/research/${id}`, { replace: true });
+    navigate(`/app/research/${id}`, { replace: true });
   };
 
   return (

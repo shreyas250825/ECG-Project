@@ -29,11 +29,11 @@ function fmtDuration(s: number) {
 
 /* ── Guided workflow ────────────────────────────────────────────────── */
 const STEPS = [
-  { n: 1, label: "Import ECG",     sub: "Load or upload a recording",        to: "/research/recordings", icon: I.upload,   color: "#3B82F6" },
-  { n: 2, label: "Assess Signal",  sub: "Quality check & preprocessing",     to: "/analysis",             icon: I.quality,  color: "#0D9488" },
-  { n: 3, label: "Build Baseline", sub: "Learn patient-specific reference",  to: "/twin",                 icon: I.database, color: "#8B5CF6" },
-  { n: 4, label: "Update Twin",    sub: "Compute cardiac state deviation",   to: "/twin",                 icon: I.twin,     color: "#EC4899" },
-  { n: 5, label: "Run Forecast",   sub: "Experimental risk estimation",      to: "/forecast",             icon: I.forecast, color: "#F59E0B" },
+  { n: 1, label: "Import ECG",     sub: "Load or upload a recording",        to: "/app/research/recordings", icon: I.upload,   color: "#3B82F6" },
+  { n: 2, label: "Assess Signal",  sub: "Quality check & preprocessing",     to: "/app/ecg",             icon: I.quality,  color: "#0D9488" },
+  { n: 3, label: "Build Baseline", sub: "Learn patient-specific reference",  to: "/app/twin",                 icon: I.database, color: "#8B5CF6" },
+  { n: 4, label: "Update Twin",    sub: "Compute cardiac state deviation",   to: "/app/twin",                 icon: I.twin,     color: "#EC4899" },
+  { n: 5, label: "Run Forecast",   sub: "Experimental risk estimation",      to: "/app/forecast",             icon: I.forecast, color: "#F59E0B" },
 ];
 
 /* ── Research questions ─────────────────────────────────────────────── */
@@ -135,7 +135,7 @@ function HeroSection() {
           }}
         >
           <Link
-            to="/analysis"
+            to="/app/ecg"
             className="btn-primary"
             style={{
               fontSize: "0.875rem",
@@ -147,7 +147,7 @@ function HeroSection() {
             Start New Analysis
           </Link>
           <Link
-            to="/twin"
+            to="/app/twin"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -406,7 +406,7 @@ function RecentRecordings({ records }: { records: ResearchRecord[] }) {
           </p>
         </div>
         <Link
-          to="/research/recordings"
+          to="/app/research/recordings"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -428,7 +428,7 @@ function RecentRecordings({ records }: { records: ResearchRecord[] }) {
           title="No recordings loaded"
           body="Load a recording from the Datasets browser in Research Lab to get started."
           action={
-            <Link to="/research/recordings" className="btn-primary" style={{ fontSize: "0.8125rem" }}>
+            <Link to="/app/research/recordings" className="btn-primary" style={{ fontSize: "0.8125rem" }}>
               Open recordings
             </Link>
           }
@@ -485,7 +485,7 @@ function RecentRecordings({ records }: { records: ResearchRecord[] }) {
                   {fmtDuration(r.duration_seconds)}
                 </span>
                 <Link
-                  to="/analysis"
+                  to="/app/ecg"
                   style={{
                     fontSize: "0.6875rem",
                     fontWeight: 600,

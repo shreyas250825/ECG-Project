@@ -131,7 +131,7 @@ export default function ExplainPage() {
 
       <div style={{ marginTop: "1.25rem" }}>
         <Link
-          to="/research/architecture"
+          to="/app/research/architecture"
           style={{
             display: "inline-flex",
             alignItems: "center",
