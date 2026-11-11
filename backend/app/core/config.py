@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,https://ecg-project-indol.vercel.app"
 
     data_dir: str = "./data"
     model_dir: str = "./backend/models"
