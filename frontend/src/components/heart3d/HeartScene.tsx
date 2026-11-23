@@ -90,29 +90,25 @@ function ToolBtn({
         borderRadius: "6px",
         border: active
           ? "1px solid rgba(20,184,166,0.5)"
-          : "1px solid rgba(255,255,255,0.08)",
+          : "1px solid #E2E8F0",
         background: active
-          ? "rgba(20,184,166,0.18)"
-          : "rgba(255,255,255,0.04)",
-        color: active ? "#14B8A6" : "rgba(255,255,255,0.55)",
+          ? "rgba(20,184,166,0.10)"
+          : "#F8FAFC",
+        color: active ? "#0D9488" : "#64748B",
         cursor: "pointer",
         transition: "all 0.15s",
         minWidth: 44,
       }}
       onMouseEnter={(e) => {
         if (!active) {
-          (e.currentTarget as HTMLElement).style.background =
-            "rgba(255,255,255,0.08)";
-          (e.currentTarget as HTMLElement).style.color =
-            "rgba(255,255,255,0.85)";
+          (e.currentTarget as HTMLElement).style.background = "#F1F5F9";
+          (e.currentTarget as HTMLElement).style.color = "#0F172A";
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
-          (e.currentTarget as HTMLElement).style.background =
-            "rgba(255,255,255,0.04)";
-          (e.currentTarget as HTMLElement).style.color =
-            "rgba(255,255,255,0.55)";
+          (e.currentTarget as HTMLElement).style.background = "#F8FAFC";
+          (e.currentTarget as HTMLElement).style.color = "#64748B";
         }
       }}
     >
@@ -145,8 +141,8 @@ function ModeToggle({
     <div
       style={{
         display: "flex",
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "#F1F5F9",
+        border: "1px solid #E2E8F0",
         borderRadius: "6px",
         overflow: "hidden",
       }}
@@ -170,14 +166,14 @@ function ModeToggle({
             padding: "6px 10px",
             border: "none",
             background:
-              mode === m.id ? "rgba(20,184,166,0.18)" : "transparent",
+              mode === m.id ? "rgba(13,148,136,0.12)" : "transparent",
             color:
-              mode === m.id ? "#14B8A6" : "rgba(255,255,255,0.45)",
+              mode === m.id ? "#0D9488" : "#64748B",
             cursor: "pointer",
             transition: "all 0.15s",
             borderRight:
               m.id === "anatomy"
-                ? "1px solid rgba(255,255,255,0.07)"
+                ? "1px solid #E2E8F0"
                 : "none",
           }}
         >
@@ -214,9 +210,9 @@ function VizStateBadge({ viz }: { viz: CardiacVisualizationState }) {
         gap: "5px",
         padding: "3px 8px 3px 6px",
         borderRadius: "6px",
-        background: "rgba(11,17,32,0.75)",
+        background: "rgba(255,255,255,0.88)",
         backdropFilter: "blur(4px)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        border: "1px solid #E2E8F0",
         pointerEvents: "none",
       }}
     >
@@ -236,7 +232,7 @@ function VizStateBadge({ viz }: { viz: CardiacVisualizationState }) {
           fontWeight: 700,
           letterSpacing: "0.06em",
           textTransform: "uppercase",
-          color: "rgba(255,255,255,0.7)",
+          color: "#334155",
         }}
       >
         {label}
@@ -259,8 +255,8 @@ function MetricPill({
     <div
       style={{
         flex: "1 1 100px",
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.07)",
+        background: "#F8FAFC",
+        border: "1px solid #E2E8F0",
         borderRadius: "6px",
         padding: "7px 10px",
       }}
@@ -271,7 +267,7 @@ function MetricPill({
           fontWeight: 700,
           letterSpacing: "0.07em",
           textTransform: "uppercase",
-          color: "rgba(255,255,255,0.35)",
+          color: "#94A3B8",
           margin: 0,
         }}
       >
@@ -281,7 +277,7 @@ function MetricPill({
         style={{
           fontSize: "12px",
           fontWeight: 600,
-          color: color ?? "rgba(255,255,255,0.82)",
+          color: color ?? "#0F172A",
           margin: "2px 0 0",
           lineHeight: 1.2,
         }}
@@ -304,7 +300,7 @@ function FallbackMessage() {
         justifyContent: "center",
         flexDirection: "column",
         gap: "8px",
-        color: "rgba(255,255,255,0.3)",
+        color: "#94A3B8",
         fontSize: "13px",
       }}
     >
@@ -477,9 +473,9 @@ function HeartSceneInner({
       style={{
         display: "flex",
         flexDirection: "column",
-        background: "#0B1120",
+        background: "#FFFFFF",
         borderRadius: "0.875rem",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid #E2E8F0",
         overflow: "hidden",
       }}
     >
@@ -490,8 +486,9 @@ function HeartSceneInner({
           alignItems: "center",
           justifyContent: "space-between",
           padding: "10px 14px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid #E2E8F0",
           flexShrink: 0,
+          background: "#FFFFFF",
         }}
       >
         <div>
@@ -499,7 +496,7 @@ function HeartSceneInner({
             style={{
               fontSize: "12px",
               fontWeight: 700,
-              color: "rgba(255,255,255,0.85)",
+              color: "#0F172A",
               margin: 0,
               letterSpacing: "-0.01em",
             }}
@@ -509,7 +506,7 @@ function HeartSceneInner({
           <p
             style={{
               fontSize: "10px",
-              color: "rgba(255,255,255,0.3)",
+              color: "#94A3B8",
               margin: 0,
             }}
           >
@@ -573,7 +570,7 @@ function HeartSceneInner({
             style={{
               width: "100%",
               height: "100%",
-              background: "#0B1120",
+              background: "#F8FAFC",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -589,7 +586,7 @@ function HeartSceneInner({
                   style={{
                     width: "100%",
                     height: "100%",
-                    background: "#0B1120",
+                    background: "#F8FAFC",
                   }}
                 >
                   <FallbackMessage />
@@ -608,17 +605,17 @@ function HeartSceneInner({
                   powerPreference: "high-performance",
                 }}
                 onCreated={({ gl }) => {
-                  gl.setClearColor("#0B1120", 1);
+                  gl.setClearColor("#F0F4F8", 1);
                 }}
               >
-                <color attach="background" args={["#0B1120"]} />
-                <fog attach="fog" args={["#0B1120", 10, 22]} />
+                <color attach="background" args={["#F0F4F8"]} />
+                <fog attach="fog" args={["#F0F4F8", 10, 22]} />
 
-                {/* Lighting */}
-                <ambientLight intensity={0.35} />
+                {/* Lighting — tuned for light background */}
+                <ambientLight intensity={0.80} />
                 <directionalLight
                   position={[4, 5, 3]}
-                  intensity={1.6}
+                  intensity={1.8}
                   castShadow
                   shadow-mapSize={[1024, 1024]}
                   shadow-camera-near={0.5}
@@ -630,17 +627,17 @@ function HeartSceneInner({
                 />
                 <directionalLight
                   position={[-3, 2, -2]}
-                  intensity={0.45}
-                  color="#a0bcd8"
+                  intensity={0.6}
+                  color="#b0c8e0"
                 />
                 <spotLight
                   position={[0, 4, 2.5]}
                   angle={0.4}
                   penumbra={0.7}
-                  intensity={0.7}
-                  color="#ffe8d0"
+                  intensity={0.9}
+                  color="#fff0e8"
                 />
-                <hemisphereLight args={["#ccd8e8", "#1a1220", 0.4]} />
+                <hemisphereLight args={["#e8f0f8", "#c8d0d8", 0.5]} />
 
                 <HeartMeshWithLabels
                   viz={viz}
@@ -653,11 +650,11 @@ function HeartSceneInner({
 
                 <ContactShadows
                   position={[0, -1.35, 0]}
-                  opacity={0.65}
+                  opacity={0.25}
                   scale={9}
                   blur={3.2}
                   far={2.8}
-                  color="#000000"
+                  color="#8899AA"
                 />
 
                 <OrbitControls
@@ -691,7 +688,7 @@ function HeartSceneInner({
                 bottom: 10,
                 right: 12,
                 fontSize: "9px",
-                color: "rgba(255,255,255,0.2)",
+                color: "rgba(15,23,42,0.35)",
                 pointerEvents: "none",
                 letterSpacing: "0.04em",
               }}
@@ -709,9 +706,10 @@ function HeartSceneInner({
             display: "flex",
             gap: "6px",
             padding: "10px 12px",
-            borderTop: "1px solid rgba(255,255,255,0.05)",
+            borderTop: "1px solid #E2E8F0",
             flexWrap: "wrap",
             flexShrink: 0,
+            background: "#FFFFFF",
           }}
         >
           <MetricPill
@@ -760,10 +758,11 @@ function HeartSceneInner({
       <div
         style={{
           padding: "7px 12px",
-          borderTop: "1px solid rgba(255,255,255,0.04)",
+          borderTop: "1px solid #E2E8F0",
           fontSize: "9.5px",
-          color: "rgba(255,255,255,0.2)",
+          color: "#94A3B8",
           flexShrink: 0,
+          background: "#FFFFFF",
         }}
       >
         {controls.mode === "anatomy"
