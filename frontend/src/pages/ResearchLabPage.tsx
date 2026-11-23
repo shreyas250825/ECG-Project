@@ -14,6 +14,7 @@ import LimitationsPage    from "./LimitationsPage";
 import AboutPage          from "./AboutPage";
 import ExplainPage        from "./ExplainPage";
 import ArchitecturePage   from "./ArchitecturePage";
+import ComparisonPage     from "./ComparisonPage";
 
 export type LabTab =
   | "pipeline"
@@ -26,10 +27,12 @@ export type LabTab =
   | "limitations"
   | "about"
   | "explain"
-  | "architecture";
+  | "architecture"
+  | "comparison";
 
 const TABS: { id: LabTab; label: string; icon: string }[] = [
   { id: "pipeline",     label: "Pipeline",          icon: "M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" },
+  { id: "comparison",   label: "ECG Comparison",     icon: "M9 19V6l3-3 3 3v13M3 19h18" },
   { id: "recordings",   label: "Recordings",         icon: "M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V9l-5-5H7c-2 0-3 1-3 3zm9-5v5h5" },
   { id: "results",      label: "Results",            icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10" },
   { id: "replay",       label: "Replay",             icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
@@ -45,6 +48,7 @@ const TABS: { id: LabTab; label: string; icon: string }[] = [
 function TabContent({ tab }: { tab: LabTab }) {
   switch (tab) {
     case "pipeline":     return <PipelinePage />;
+    case "comparison":   return <ComparisonPage />;
     case "recordings":   return <DatasetsPage />;
     case "results":      return <ResultsPage />;
     case "replay":       return <ReplayPage />;

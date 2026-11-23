@@ -77,7 +77,7 @@ export default function App() {
         } />
 
         {/* Research Lab deep-links */}
-        {(["pipeline","recordings","results","replay","hardware",
+        {(["pipeline","comparison","recordings","results","replay","hardware",
            "methodology","scope","limitations","about","explain","architecture"] as LabTab[])
           .map((tab) => (
             <Route key={tab} path={`/app/research/${tab}`} element={
