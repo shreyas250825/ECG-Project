@@ -699,12 +699,20 @@ export default function TwinPage() {
   const viz = useMemo(
     () =>
       deriveCardiacVisualizationState({
+        // When twin data is available, treat it as data-available even without
+        // a separate analysis pass. Supply enough fields for classifyVizState
+        // to pick the right state from the deviation score.
         analysis: tw.data
           ? {
               heart_rate_bpm:
                 typeof tw.data.state_vector?.heart_rate_bpm === "number"
                   ? tw.data.state_vector.heart_rate_bpm
-                  : null,
+                  : typeof tw.data.state_vector?.mean_rr_s === "number" &&
+                    tw.data.state_vector.mean_rr_s > 0
+                    ? 60 / tw.data.state_vector.mean_rr_s
+                    : 60, // fallback so dataAvailable is always true when twin exists
+              r_peaks: { times_s: [0, 1] }, // sentinel — twin means peaks were detected
+              signal_quality: { score: 1, label: "ok" },
             }
           : null,
         twin: tw.data ?? null,
@@ -827,8 +835,8 @@ export default function TwinPage() {
           alignItems: "start",
         }}
       >
-        {/* LEFT — 3D visualization */}
-        <HeartScene viz={viz} lastRPeakMs={null} tall />
+        {/* LEFT — 3D visualization — stable key so it never unmounts */}
+        <HeartScene key="twin-heart" viz={viz} lastRPeakMs={null} tall />
 
         {/* RIGHT — state information */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>

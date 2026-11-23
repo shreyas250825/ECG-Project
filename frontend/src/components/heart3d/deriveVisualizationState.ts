@@ -40,9 +40,14 @@ function classifyVizState(args: {
   deviation: number | null;
   forecastScore: number | null;
   modelAvailable: boolean;
+  twinExists: boolean;
 }): ResearchVizState {
   if (!args.dataAvailable) return "NO_DATA";
-  if (args.deviation == null && !args.modelAvailable) return "INSUFFICIENT_EVIDENCE";
+  // If we have a twin but no deviation yet (baseline not set), show STABLE
+  // rather than INSUFFICIENT_EVIDENCE — the twin computed successfully.
+  if (args.deviation == null && !args.modelAvailable) {
+    return args.twinExists ? "STABLE" : "INSUFFICIENT_EVIDENCE";
+  }
   if (args.forecastScore != null && args.forecastScore >= 0.65) return "ELEVATED_RESEARCH_RISK";
   if (args.deviation != null && args.deviation >= 2.0) return "ELEVATED_RESEARCH_RISK";
   if (args.deviation != null && args.deviation >= 1.0) return "DEVIATION";
@@ -89,7 +94,7 @@ export function deriveCardiacVisualizationState(input: {
   const forecastScore = forecast?.model_score ?? null;
   const modelAvailable = modelTrained || forecast?.status === "ok" || forecast?.model_score != null;
 
-  const vizState = classifyVizState({ dataAvailable, deviation, forecastScore, modelAvailable });
+  const vizState = classifyVizState({ dataAvailable, deviation, forecastScore, modelAvailable, twinExists: !!twin });
 
   let currentState = "Waiting for ECG data";
   if (dataAvailable && twin?.deviation_score == null && !twin) {

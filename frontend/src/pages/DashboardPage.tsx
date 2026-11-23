@@ -260,7 +260,7 @@ export default function DashboardPage() {
           </div>
           {proc.error && <p className="text-sm text-red-800">{(proc.error as Error).message}</p>}
         </div>
-        <HeartScene viz={analysis || twin || forecast ? viz : EMPTY_VISUALIZATION_STATE} lastRPeakMs={lastRPeakMs} />
+        <HeartScene key="dashboard-heart" viz={analysis || twin || forecast ? viz : EMPTY_VISUALIZATION_STATE} lastRPeakMs={lastRPeakMs} />
       </div>
 
       <CardiacStatePanel viz={viz} />
