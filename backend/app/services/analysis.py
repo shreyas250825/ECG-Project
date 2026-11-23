@@ -91,7 +91,6 @@ def analyse_record(record_id: str, execution_mode: str = "auto") -> dict:
     hw = acc.status()
     params = PreprocessParams(fs=fs)
     cleaned = preprocess_ecg(signal, params)
-    fir = acc.preprocess_ecg(signal, fs)
     peaks = detect_r_peaks(cleaned, fs)
     rr = compute_rr_intervals(peaks, fs)
     hr = compute_hr(rr)
@@ -103,6 +102,12 @@ def analyse_record(record_id: str, execution_mode: str = "auto") -> dict:
     clean_y, _ = downsample_series(cleaned)
     peak_times = (peaks / fs).astype(float).tolist()
     rr_times = ((peaks[1:] + peaks[:-1]) / 2 / fs).astype(float).tolist() if len(peaks) > 1 else []
+
+    # FIR DSP preview: only filter a short tail of the signal (last 4000 samples)
+    # so we're not running lfilter over millions of samples for a 500-point output.
+    preview_len = min(len(signal), int(fs * 30))  # at most 30 seconds
+    fir_preview_signal = signal[-preview_len:]
+    fir = acc.preprocess_ecg(fir_preview_signal, fs)
 
     run = store.add_processing_run(
         {

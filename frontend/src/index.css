@@ -29,9 +29,12 @@
 html { scroll-behavior: smooth; }
 html, body, #root { min-height: 100%; }
 
+/* Landing page needs a dark background — the app pages use #F0F4F8 (light).
+   We set body default to dark so the landing page never flashes white.
+   App pages explicitly set background on their containers. */
 body {
   margin: 0;
-  background: var(--color-bg);
+  background: #05070B;
   color: var(--color-ink);
   font-family: var(--font-sans);
   line-height: 1.6;
@@ -41,6 +44,9 @@ body {
   padding-left:   env(safe-area-inset-left);
   padding-right:  env(safe-area-inset-right);
 }
+
+/* App shell pages (dashboard, analysis, etc.) restore the light background */
+.app-shell-layout { background: var(--color-bg); }
 
 h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.025em; line-height: 1.25; }
 
@@ -601,4 +607,77 @@ canvas { display: block; max-width: 100%; }
     scroll-snap-align: start;
     flex-shrink: 0;
   }
+}
+
+/* ══════════════════════════════════════════════════════
+   LANDING PAGE — layout classes
+   These must live here so they're available immediately,
+   before the inline <style> tag in LandingPage.tsx renders.
+══════════════════════════════════════════════════════ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.landing-desktop-nav { display: flex; align-items: center; gap: 0.25rem; }
+.landing-hamburger   { display: none; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hero-heart-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workflow-steps-landing {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.workflow-line-landing {
+  position: absolute;
+  top: 40px; left: 10%; right: 10%;
+  height: 1px;
+}
+
+.about-grid-landing {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.footer-grid-landing {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Landing responsive */
+@media (max-width: 900px) {
+  .hero-grid                { grid-template-columns: 1fr !important; }
+  .hero-heart-container     { height: 420px !important; order: -1; }
+  .workflow-steps-landing   { grid-template-columns: repeat(3, 1fr) !important; }
+  .workflow-line-landing    { display: none !important; }
+  .about-grid-landing       { grid-template-columns: 1fr !important; }
+  .footer-grid-landing      { grid-template-columns: 1fr 1fr !important; }
+}
+@media (max-width: 640px) {
+  .landing-desktop-nav      { display: none !important; }
+  .landing-hamburger        { display: flex !important; }
+  .workflow-steps-landing   { grid-template-columns: repeat(2, 1fr) !important; }
+  .footer-grid-landing      { grid-template-columns: 1fr !important; }
+  .hero-heart-container     { height: 320px !important; }
+}
+@media (max-width: 400px) {
+  .workflow-steps-landing   { grid-template-columns: 1fr !important; }
+  .hero-heart-container     { height: 280px !important; }
 }

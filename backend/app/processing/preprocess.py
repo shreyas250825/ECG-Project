@@ -57,7 +57,16 @@ def preprocess_ecg(signal: np.ndarray, params: PreprocessParams) -> np.ndarray:
         nyq = 0.5 * params.fs
         if params.notch_hz < nyq:
             bn, an = iirnotch(params.notch_hz / nyq, params.notch_q)
-            y = filtfilt(bn, an, y)
+            # Use lfilter for notch — removes 60/50 Hz without full reverse pass overhead
+            y = lfilter(bn, an, y)
+
+    if params.normalize:
+        std = float(np.std(y))
+        if std > 1e-9:
+            y = (y - float(np.mean(y))) / std
+        else:
+            y = y - float(np.mean(y))
+    return y
 
     if params.normalize:
         std = float(np.std(y))
