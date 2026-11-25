@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router
+from app.api.classification_routes import router as classification_router
 from app.core.config import settings
 from app.core.errors import ResearchError, http_error_handler, research_error_handler
 from app.core.logging import configure_logging
@@ -32,9 +33,17 @@ app.add_exception_handler(ResearchError, research_error_handler)
 app.add_exception_handler(HTTPException, http_error_handler)
 
 app.include_router(router, prefix="/api")
+app.include_router(classification_router, prefix="/api")
 app.include_router(ws_router)
 
 
 @app.on_event("startup")
 def startup() -> None:
     ensure_demo_record()
+    # Pre-load classification models at startup
+    try:
+        from app.services.inference.model_registry import get_registry
+        get_registry()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Could not pre-load classification models: %s", e)

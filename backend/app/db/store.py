@@ -118,4 +118,23 @@ class MemoryStore:
         return list(rows)
 
 
-store = MemoryStore()
+def _make_store():
+    """
+    Return SQLiteStore for persistent local development,
+    or MemoryStore if SQLite is unavailable (e.g. read-only filesystem).
+    """
+    try:
+        from app.db.sqlite_store import SQLiteStore
+        s = SQLiteStore()
+        import logging
+        logging.getLogger(__name__).info("Using SQLite persistent store: %s", s._path)
+        return s
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(
+            "SQLite store unavailable (%s); falling back to MemoryStore.", e
+        )
+        return MemoryStore()
+
+
+store = _make_store()

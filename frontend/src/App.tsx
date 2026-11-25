@@ -19,6 +19,7 @@ const AnalysisPage    = lazy(() => import("./pages/AnalysisPage"));
 const TwinPage        = lazy(() => import("./pages/TwinPage"));
 const ForecastPage    = lazy(() => import("./pages/ForecastPage"));
 const ResearchLabPage = lazy(() => import("./pages/ResearchLabPage"));
+const BeatClassPage   = lazy(() => import("./pages/BeatClassificationPage"));
 
 import type { LabTab } from "./pages/ResearchLabPage";
 
@@ -71,6 +72,9 @@ export default function App() {
         } />
         <Route path="/app/forecast" element={
           <Suspense fallback={<AppLoader />}><ForecastPage /></Suspense>
+        } />
+        <Route path="/app/classification" element={
+          <Suspense fallback={<AppLoader />}><BeatClassPage /></Suspense>
         } />
         <Route path="/app/research" element={
           <Suspense fallback={<AppLoader />}><ResearchLabPage /></Suspense>

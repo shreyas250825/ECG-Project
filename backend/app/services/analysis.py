@@ -222,19 +222,36 @@ def update_twin(record_id: str, timestamp_s: float | None, window_s: float) -> d
     t_start = max(0.0, t_end - window_s)
     fv = window_features(signal, fs, t_start, t_end)
     bl = baseline_from_store(record_id)
-    state = build_state(record_id, t_end, fv["values"], bl)
+
+    # Compute RR intervals for pNN50
+    from app.processing.rpeaks import compute_rr_intervals, detect_r_peaks
+    from app.processing.preprocess import PreprocessParams, preprocess_ecg as _preprocess
+    a = max(0, int(t_start * fs))
+    b = min(len(signal), int(t_end * fs))
+    cleaned_seg = _preprocess(signal[a:b], PreprocessParams(fs=fs))
+    peaks_seg = detect_r_peaks(cleaned_seg, fs)
+    rr_seg = compute_rr_intervals(peaks_seg, fs)
+
+    state = build_state(record_id, t_end, fv["values"], bl, rr_intervals=rr_seg)
     payload = {
-        "record_id": record_id,
-        "timestamp": t_end,
-        "state_vector": state.state_vector,
-        "deviation": state.deviation,
-        "deviation_score": state.deviation_score,
-        "definition": state.definition,
-        "notes": state.notes,
-        "current_features": fv["values"],
-        "baseline": store.get_baseline(record_id),
-        "disclaimer": DISCLAIMER,
-        "language": "Deviation from learned baseline",
+        "record_id":          record_id,
+        "timestamp":          t_end,
+        # 12-dimensional personalized state (new Track B)
+        "absolute_features":  state.absolute_features,
+        "baseline_deviation": state.baseline_deviation,
+        "deviation_z":        state.deviation_z,
+        "personalized_state": state.personalized_state,
+        # Legacy fields (backward compat with existing frontend)
+        "state_vector":       state.state_vector,
+        "deviation":          state.deviation,
+        "deviation_score":    state.deviation_score,
+        "definition":         state.definition,
+        "notes":              state.notes,
+        "units":              state.units,
+        "current_features":   fv["values"],
+        "baseline":           store.get_baseline(record_id),
+        "disclaimer":         DISCLAIMER,
+        "track":              "B — patient-specific digital twin",
     }
     store.add_twin_state(payload)
     return payload

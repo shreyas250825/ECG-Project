@@ -16,10 +16,18 @@ class PreprocessParams:
     fs: float
     highpass_hz: float = 0.5
     lowpass_hz: float = 40.0
-    notch_hz: float | None = 50.0
+    notch_hz: float | None = None   # None = auto-detect from fs; 60Hz for ≥360Hz, else 50Hz
     notch_q: float = 30.0
     order: int = 4
     normalize: bool = True
+
+    def effective_notch_hz(self) -> float | None:
+        if self.notch_hz is not None:
+            return self.notch_hz
+        # Auto-detect: MIT-BIH (360 Hz) → 60 Hz; most EU databases → 50 Hz
+        if self.fs >= 350:
+            return 60.0
+        return 50.0
 
 
 def _butter_bandpass(low: float, high: float, fs: float, order: int) -> tuple[np.ndarray, np.ndarray]:
@@ -53,11 +61,12 @@ def preprocess_ecg(signal: np.ndarray, params: PreprocessParams) -> np.ndarray:
     b, a = _butter_bandpass(params.highpass_hz, params.lowpass_hz, params.fs, params.order)
     y = filtfilt(b, a, x)
 
-    if params.notch_hz:
+    if params.effective_notch_hz() is not None:
+        notch_hz = params.effective_notch_hz()
         nyq = 0.5 * params.fs
-        if params.notch_hz < nyq:
-            bn, an = iirnotch(params.notch_hz / nyq, params.notch_q)
-            # Use lfilter for notch — removes 60/50 Hz without full reverse pass overhead
+        if notch_hz < nyq:
+            bn, an = iirnotch(notch_hz / nyq, params.notch_q)
+            # Use lfilter for notch — causal single-pass, fast for long signals
             y = lfilter(bn, an, y)
 
     if params.normalize:

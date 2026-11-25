@@ -75,4 +75,41 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     }).then(parse),
+
+  // ── Beat Classification — Track A ─────────────────────────────────────────
+  classificationModels: () =>
+    fetch(`${API}/classification/models`).then(parse),
+  classificationModelDetail: (key: string) =>
+    fetch(`${API}/classification/models/${encodeURIComponent(key)}`).then(parse),
+  classificationPredictSingle: (body: {
+    features: number[];
+    model_key?: string;
+    runtime?: string;
+  }) =>
+    fetch(`${API}/classification/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(parse),
+  classificationPredictBatch: (body: {
+    features_matrix: number[][];
+    model_key?: string;
+    runtime?: string;
+  }) =>
+    fetch(`${API}/classification/predict-batch`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(parse),
+  classificationEvaluateDs2: (maxBeats?: number, runtime?: string) => {
+    const params = new URLSearchParams();
+    if (maxBeats != null) params.set("max_beats", String(maxBeats));
+    if (runtime) params.set("runtime", runtime);
+    const qs = params.toString();
+    return fetch(`${API}/classification/evaluate-ds2${qs ? "?" + qs : ""}`, {
+      method: "POST",
+    }).then(parse);
+  },
+  classificationLatest: () =>
+    fetch(`${API}/classification/results/latest`).then(parse),
 };

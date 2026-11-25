@@ -18,6 +18,7 @@ const IC = {
   ecg:      "M22 12h-4l-3 9L9 3l-3 9H2",
   twin:     "M12 2a10 10 0 100 20A10 10 0 0012 2zm0 0v20M2 12h20",
   forecast: "M2 12l3-3 4 4 4-7 4 4 3-3M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12",
+  classify: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
   lab:      "M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18",
   more:     "M4 6h16M4 12h16M4 18h16",
   close:    "M18 6L6 18M6 6l12 12",
@@ -277,9 +278,10 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
         <SideNavItem to="/app"          icon={IC.overview} label="Overview"     end />
-        <SideNavItem to="/app/ecg"      icon={IC.ecg}      label="ECG Analysis"    />
-        <SideNavItem to="/app/twin"     icon={IC.twin}     label="Digital Twin"    />
-        <SideNavItem to="/app/forecast" icon={IC.forecast} label="Forecasting"     />
+        <SideNavItem to="/app/ecg"            icon={IC.ecg}      label="ECG Analysis"       />
+        <SideNavItem to="/app/classification" icon={IC.classify} label="Beat Classification" />
+        <SideNavItem to="/app/twin"           icon={IC.twin}     label="Digital Twin"       />
+        <SideNavItem to="/app/forecast"       icon={IC.forecast} label="Forecasting"        />
         <p className="sidebar-section-label" style={{ marginTop: "0.75rem" }}>Research Lab</p>
         <SideNavItem to="/app/research" icon={IC.lab}      label="Research Lab"    />
       </nav>
